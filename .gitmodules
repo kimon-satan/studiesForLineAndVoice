@@ -1,0 +1,9 @@
+[submodule "lineStudies"]
+	path = lineStudies
+	url = git@github.com:kimon-satan/lineStudies.git
+[submodule "linestudy_1_breath"]
+	path = linestudy_1_breath
+	url = git@github.com:kimon-satan/linestudy_1_breath.git
+[submodule "linestudy_2_waves"]
+	path = linestudy_2_waves
+	url = git@github.com:kimon-satan/linestudy_2_waves.git
