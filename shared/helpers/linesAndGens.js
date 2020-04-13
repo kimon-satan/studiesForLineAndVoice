@@ -153,3 +153,36 @@ class SineGen
   }
 
 }
+
+class SquareGen
+{
+  //TODO add skewing functions ?
+
+  freq;
+  amp;
+  phase;
+
+  constructor(freq, amp, phase)
+  {
+    this.freq = freq;
+    this.amp = amp;
+    this.phase = phase;
+  }
+
+  update(phaseInc)
+  {
+    this.phase += phaseInc;
+  }
+
+  value(progress)
+  {
+    let phase = (this.phase * 2)%2;
+    if(phase < 0)
+    {
+      phase += 2;
+    }
+    let s = (floor(this.freq * progress * 2 + phase))%2;
+    return -this.amp/2 + s * this.amp;
+  }
+
+}
