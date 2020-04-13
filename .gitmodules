@@ -7,3 +7,6 @@
 [submodule "linestudy_2_waves"]
 	path = linestudy_2_waves
 	url = git@github.com:kimon-satan/linestudy_2_waves.git
+[submodule "linestudy_3_warping"]
+	path = linestudy_3_warping
+	url = git@github.com:kimon-satan/linestudy_3_warping.git
