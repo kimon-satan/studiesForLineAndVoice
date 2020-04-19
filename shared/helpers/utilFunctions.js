@@ -195,3 +195,40 @@ function normalise(data)
   }
 
 }
+
+function myShuffle(array) {
+  for (let i = array.length - 1; i > 0; i--) {
+    let j = Math.floor(Math.random() * (i + 1));
+    [array[i], array[j]] = [array[j], array[i]];
+  }
+}
+
+function choose(array, numItems, unique=true)
+{
+  const c_array = [...array]; //make a copy - WARNING one level deep only !
+  const n_array = [];
+
+  for(let i = 0; i < numItems; i++)
+  {
+    let idx = floor(random(0,c_array.length));
+    if(unique)
+    {
+      let e = c_array.splice(idx,1);
+      n_array.push(e[0]);
+    }
+    else
+    {
+      n_array.push(c_array[idx]);
+    }
+  }
+
+  if(numItems > 1)
+  {
+    return n_array;
+  }
+  else
+  {
+    return n_array[0];
+  }
+
+}

@@ -1,10 +1,8 @@
 #### More Ideas
 
-- blending fixed shapes and sine waves (create different blending functions)
-- extend progression by adding sine waves together + noise
 - symmetries
 - linear movement from one shape to another
-- try more manipulations of control points on beziers
+
 
 #### Presentation ideas
 
