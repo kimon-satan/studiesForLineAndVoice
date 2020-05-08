@@ -18,10 +18,10 @@ class SimpleLine
   {
     //progress should be values between 0 and 1
     progress = constrain(progress,0,1);
-    var v = progress * this.vertices.length;
-    var a = constrain(floor(v), 0, this.vertices.length -1);
+    var v = progress * (this.vertices.length -1);
+    var a = constrain(floor(v), 0, this.vertices.length -2);
     var remainder  = v - a;
-    var b = constrain(a + 1, 0, this.vertices.length);
+    var b = constrain(a + 1, 0, this.vertices.length-1);
 
     return p5.Vector.lerp(this.vertices[a], this.vertices[b], remainder);
   }

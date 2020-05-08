@@ -97,21 +97,122 @@ function calcSplineEnv(numPoints,values,durations)
 
 
 // Bezier curves
-function calcBezierVertices(numPoints,controlPoints)
+function calcBezierVertices(numPoints,controlPoints,ratios=null)
 {
   //an arbitrary number of control points
   var d = [];
+
   for(let i = 0; i < numPoints; i++)
   {
     let t = i/(numPoints-1);
 
-    let derivedVector  = deCasteljau(controlPoints,t);
-    d.push(derivedVector);
+    if(ratios === null)
+    {
+      let derivedVector  = deCasteljau(t,controlPoints);
+      d.push(derivedVector);
+    }
+    else
+    {
+      let derivedVector = calcBezierVertex(t,controlPoints,ratios);
+      d.push(derivedVector);
+    }
   }
   return d;
 }
 
-function deCasteljau(vectors, t)
+function calcBezierVertex(t,controlPoints,ratios=null)
+{
+
+    let n = controlPoints.length-1;
+    let v = createVector(0,0);
+    let xs = [];
+    let ys = [];
+
+    for(let i = 0; i < controlPoints.length; i++)
+    {
+      xs.push(controlPoints[i].x);
+      ys.push(controlPoints[i].y);
+    }
+
+    if(ratios != null)
+    {
+      console.assert(controlPoints.length == ratios.length, "controlPoints.length != ratios.length");
+      v.x = getRationalBezierValue(n,t,xs,ratios);
+      v.y = getRationalBezierValue(n,t,ys,ratios);
+    }
+    else
+    {
+      v.x = getBezierValue(n,t,xs);
+      v.y = getBezierValue(n,t,ys);
+    }
+
+    return v;
+}
+
+
+
+let pascalLookUp  = [
+             [1],           // n=0
+            [1,1],          // n=1
+           [1,2,1],         // n=2
+          [1,3,3,1],        // n=3
+         [1,4,6,4,1],       // n=4
+        [1,5,10,10,5,1],    // n=5
+       [1,6,15,20,15,6,1]   // n=6
+];
+
+function binomial(n,k)
+{
+  //expand table if necessary
+  while(n >= pascalLookUp.length)
+  {
+    let s = pascalLookUp.length;
+    let nextRow = new Array(s+1);
+    nextRow[0] = 1;
+    for(let i=1, prev=s-1; i<s; i++)
+    {
+      nextRow[i] = pascalLookUp[prev][i-1] + pascalLookUp[prev][i];
+    }
+    nextRow[s] = 1;
+    pascalLookUp.push(nextRow);
+  }
+
+  return pascalLookUp[n][k];
+}
+
+function getBezierValue(n,t,w)
+{
+  let sum = 0;
+  for(let k=0; k<=n; k++)
+  {
+    sum += w[k] * binomial(n,k) * (1-t)**(n-k) * t**k;
+  }
+  return sum;
+}
+
+function getRationalBezierValue(n,t,w,r)
+{
+  let f = [];
+
+  for(let k=0; k<=n; k++)
+  {
+    f.push(r[k] * binomial(n,k) * (1-t)**(n-k) * t**k);
+  }
+
+  let basis = 0;
+  let sum = 0;
+
+  for(let i = 0; i < f.length; i++)
+  {
+    basis += f[i];
+    sum += f[i] * w[i];
+  }
+  return sum/basis;
+}
+
+
+
+function deCasteljau(t, vectors)
 {
   //recursive algorithm to crunch bezier control points into a single vector
   let derivedVectors = [];
@@ -123,7 +224,7 @@ function deCasteljau(vectors, t)
 
   if(derivedVectors.length > 1)
   {
-    return deCasteljau(derivedVectors,t);
+    return deCasteljau(t,derivedVectors);
   }
   else
   {
@@ -131,6 +232,51 @@ function deCasteljau(vectors, t)
   }
 
 }
+
+function calcCatmullRomControlPoints(a,b,va,vb,t)
+{
+
+ //https://stackoverflow.com/questions/34894837/how-to-get-connect-two-part-of-curve-and-get-the-points-position-of-connecting-c
+/*
+
+    start point: a (p2)
+    control point 1: a + (b-p1)/(6*t)
+    control point 2: b - (p4-a)/(6*t)
+    end point: b (p3)
+
+    t = tightness could be one
+*/
+  let distance = p5.Vector.dist(a, b);
+
+
+  //calc p1 & p4
+  va.setMag(distance);
+  va.mult(-1);
+  vb.setMag(distance);
+  vb.mult(-1);
+  let p1 = p5.Vector.add(b,va);
+  let p4 = p5.Vector.add(a,vb);
+
+  let controlPoints = [];
+
+  controlPoints.push(a);
+
+  let cp_1 = p5.Vector.sub(b,p1);
+  cp_1.div(6 * t);
+  cp_1.add(a);
+  controlPoints.push(cp_1);
+
+  let cp_2 = p5.Vector.sub(p4,a);
+  cp_2.div(6 * t);
+  cp_2 = p5.Vector.sub(b,cp_2);
+  controlPoints.push(cp_2);
+
+  controlPoints.push(b);
+
+  return controlPoints;
+
+}
+
 
 //interpolation
 
